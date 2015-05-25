@@ -30,70 +30,89 @@ library(scales)
 library(gridExtra)
 ```
 
-#```{r echo=FALSE, Load_the_Data}
-# Load the Data
-setwd('Documents/data_science/p3/final_project/')
-loanData<-read.csv('../data/prosperLoanData.csv')
-loanData$Term <-factor(loanData$Term)
-loanData$HasCreditGrade <- !(loanData$CreditGrade=='')
-loanData$DebtLevel <- cut(loanData$DebtToIncomeRatio,c(0,.3,.49,1,10.5))
-loanData$LoanPeriod <- cut(loanData$LoanMonthsSinceOrigination,c(0,13,56,65,105))
-loanData$LoanPeriod2 <-cut(loanData$LoanMonthsSinceOrigination,c(0,55,105),labels=c("post-recession","pre-recession"))
-loanData
-loanData$BadCredit <-loanData$CreditScoreRangeLower<600
-loanData$DebtLevelBucket <- cut(loanData$DebtToIncomeRatio,c(0,0.49,1,10))
 
-loanData$LoanOriginalAmountBucket <- cut(loanData$LoanOriginalAmount,seq(0,25000,1000))
-#```
 
 
 
 # Univariate Plots Section
-```{r echo=FALSE, Univariate_Plots}
-### Loan Info----
+
+## Loan Info
+
+```{r echo=FALSE, Univariate_Plots_1.1,warning=FALSE}
 ggplot(aes(x=BorrowerRate),data=loanData)+
   geom_histogram(binwidth=.005)+
   scale_x_continuous(breaks=seq(0,.5,.02))
 
 summary(loanData$BorrowerRate)
-## BorrowerRate Ranges from 0 to .05
+```
+
+##### BorrowerRate Ranges from 0 to .05
+
+```{r echo=FALSE, Univariate_Plots_1.2,warning=FALSE}
 quantile(loanData$BorrowerRate,.1)
 quantile(loanData$BorrowerRate,.9)
-## most borrowers have a rate between .1 and .31
+```
+
+##### most borrowers have a rate between .1 and .31
+
+```{r echo=FALSE, Univariate_Plots_1.3,warning=FALSE}
 loanData$BorrowerRateCategory<-cut(loanData$BorrowerRate,c(0,0.1,0.31,0.5),labels=c('low','normal','high'))
 
 
 ggplot(aes(x=LoanOriginalAmount),data=loanData)+
   geom_histogram(binwidth = 5000)
 summary(loanData$LoanOriginalAmount)
-## all loans are between 0 and 35,000...
-## 75% of loans are under 12,000...
+```
 
+##### all loans are between 0 and 35,000...
+
+##### 75% of loans are under 12,000...
+
+```{r echo=FALSE, Univariate_Plots_1.4,warning=FALSE}
 ggplot(aes(x=Term),data=loanData)+
   geom_histogram()
-## All loans have a term of either 1,3 or 5 years.
 loanData$Term <-factor(loanData$Term)
-### Borrower Info----
+```
 
+##### All loans have a term of either 1,3 or 5 years.
+
+## Borrower Info
+```{r echo=FALSE, Univariate_Plots_1.5,warning=FALSE}
 summary(loanData$EmploymentStatus)
-## the large majority of loans go to individuals who are employed full time...
-
+```
+##### the large majority of loans go to individuals who are employed full time...
+#### IsBorrowerHomeowner:
+```{r echo=FALSE, Univariate_Plots_1.6,warning=FALSE}
 summary(loanData$IsBorrowerHomeowner)
-## about half and half
+```
+##### about half and half
+```{r echo=FALSE, Univariate_Plots_1.7,warning=FALSE}
 summary(loanData$BorrowerState)
-#pretty even distribution by population
+```
+#####pretty even distribution by state population
+```{r echo=FALSE, Univariate_Plots_1.8,warning=FALSE}
 summary(loanData$Occupation)
+```
 
+##Credit and Ratings
 
-###Credit and Ratings-----
+```{r echo=FALSE, Univariate_Plots_1.9,warning=FALSE}
 summary(loanData$ProsperRating..Alpha.)
 summary(loanData$CreditGrade)
-## A large number of Borrowers either don't have a prosper rating or a credit score...
-## lets create new variables to indicate weather a user has a credit grade or a prosper rating
+```
+
+##### A large number of Borrowers either don't have a prosper rating or a credit score...
+
+##### lets create new variables to indicate weather a user has a credit grade or a prosper rating
+
+```{r echo=FALSE, Univariate_Plots_1.10,warning=FALSE}
 loanData$HasCreditGrade <- !(loanData$CreditGrade==''|is.na(loanData$CreditGrade))
 loanData$HasProsperRating <- !(loanData$ProsperRating..Alpha.==''|is.na(loanData$ProsperRating..Alpha.))
+```
 
-## I'm also going to switch the order so that AA comes before A
+##### I'm also going to switch the order so that AA comes before A
+
+```{r echo=FALSE, Univariate_Plots1.11,warning=FALSE}
 loanData$ProsperRating..Alpha. <- factor(loanData$ProsperRating..Alpha., levels =c("AA","A","B","C","D","E","HR","NC",""))
 loanData$ProsperRating..Alpha. <- factor(loanData$ProsperRating..Alpha., levels =c("AA","A","B","C","D","E","HR",""))
                                
@@ -102,14 +121,21 @@ ggplot(aes(x=CreditScoreRangeLower),data=loanData)+
   scale_x_continuous(breaks=seq(0,900,20))+
   theme(axis.text.x=element_text(angle = 60, hjust = 1))
 summary(loanData$CreditScoreRangeLower)
-## Most borrowers have a credit score between 600 and 800
+```
 
+##### Most borrowers have a credit score between 600 and 800
 
-###Income----
+##Income
+
+```{r echo=FALSE, Univariate_Plots1.12,warning=FALSE}
 summary(loanData$IncomeRange)
-## few loans are given out to individuals with low income, or who are unemployed, no surprises here...
-## let's reorder IncomeRange and create a new variable to indicate weather a borrower is reported as having an income 
+```
 
+##### few loans are given out to individuals with low income, or who are unemployed, no surprises here...
+
+##### let's reorder IncomeRange and create a new variable to indicate weather a borrower is reported as having an income 
+
+```{r echo=FALSE, Univariate_Plots1.13,warning=FALSE}
 loanData$IncomeRange <- factor(loanData$IncomeRange,levels=c("$75,000-99,999","$50,000-74,999","$25,000-49,999","$1-24,999","$0","Not employed","Not displayed"))
 
 HasIncome <-loanData$IncomeRange == "$75,000-99,999"|loanData$IncomeRange == "$50,000-74,999"|loanData$IncomeRange == "$25,000-49,999"|loanData$IncomeRange == "$1-24,999"
@@ -125,8 +151,11 @@ ggplot(aes(StatedMonthlyIncome),data=subset(loanData,StatedMonthlyIncome>0))+
   geom_histogram(binwidth=.05)+
   scale_x_log10(limits=c(500,50000),breaks=c(1000,3000,10000,30000))
 summary(loanData$StatedMonthlyIncome)
+```
 
-###Debt----
+##Debt
+
+```{r echo=FALSE, Univariate_Plots1.14,warning=FALSE}
 ggplot(aes(x=DebtToIncomeRatio),data=loanData)+
   geom_histogram(binwidth=.05)
 
@@ -137,26 +166,35 @@ ggplot(aes(x=DebtToIncomeRatio),data=loanData)+
 ggplot(aes(x=DebtToIncomeRatio),data=loanData)+
   scale_x_log10(breaks=c(.01,.03,.1,.3,.49,1,10))+
   geom_histogram(binwidth=.1)
+```
 
-## I read that the general cutoff for getting a loan is .49... It seems odd to say the least that there are DebtToIncomeRatios in this dataset that are up to 1 and even greater than 10.
+##### most debt levels are in the range of 0 to 1
+
+```{r echo=FALSE, Univariate_Plots1.15,warning=FALSE}
 summary(loanData$DebtToIncomeRatio)
 loanData$DebtLevel <- cut(loanData$DebtToIncomeRatio,c(0,.3,.49,1,10.5))
 loanData$DebtLevel <- cut(loanData$DebtToIncomeRatio,c(0,.3,.49,1,10.5))
-###Quarter-----
+```
 
+##Quarter
+
+```{r echo=FALSE, Univariate_Plots,warning=FALSE}
 ggplot(aes(x=LoanOriginationQuarter),data=loanData)+
   geom_bar()+
   theme(axis.text.x=element_text(angle = 45, hjust = 1))
-## Lets reorder these by time and try again
+```
 
+##### Lets reorder these by time and try again
+
+```{r echo=FALSE, Univariate_Plots1.16,warning=FALSE}
 loanData$LoanOriginationQuarter <- factor(loanData$LoanOriginationQuarter, levels = c("Q1 2006","Q2 2006","Q3 2006" ,"Q4 2006","Q1 2007","Q2 2007","Q3 2007" ,"Q4 2007","Q1 2008","Q2 2008","Q3 2008" ,"Q4 2008","Q1 2009","Q2 2009","Q3 2009" ,"Q4 2009","Q1 2010","Q2 2010","Q3 2010" ,"Q4 2010","Q1 2011","Q2 2011","Q3 2011" ,"Q4 2011","Q1 2012","Q2 2012","Q3 2012" ,"Q1 2013","Q2 2013","Q3 2013" ,"Q4 2013","Q4 2013","Q1 2014"))
 
 ggplot(aes(x=LoanOriginationQuarter),data=loanData)+
   geom_bar()+
   theme(axis.text.x=element_text(angle = 45, hjust = 1))
-## thats better... we can see here that the number of loans given out dropped dramatically in the last quarter of 2008, ....
-###----
 ```
+
+##### thats better... we can see here that the number of loans given out dropped dramatically in the last quarter of 2008, ....
 
 # Univariate Analysis
 
@@ -170,7 +208,7 @@ DebtToIncomeRatio
 LoanOriginalAmount
 StatedMonthlyIncome 
 
-####Ordered factor variables 
+####Ordered factor variables:
 #####(from best to worst / greatest to least...)
 
 #####Term: 
@@ -201,13 +239,21 @@ AK, AL, AR, AZ, CA, CO, CT, DC, DE, FL, GA, HI, IA, ID, IL, IN, KS, KY, LA, MA, 
 
 ####Other observations:
 The majority of loans go to individuals who are employed full time.
+
 Few loans are given out to individuals with low income, or who are unemployed.
+
 Most Borrowers do not have a credit grade.
+
 Loans amounts range from 0 to $35,000. 
+
 75% of loans are for under $12,000.
+
 Nearly all of the loans given out are 100% funded.
+
 Most loans have 0 net principal loss.
+
 Most borrowers have 0 delinquincies in the past 7 years.
+
 Few loans are given out from Q4 2008 through Q2 2009. 
 
 ### What is/are the main feature(s) of interest in your dataset?
@@ -220,36 +266,43 @@ It is hard to say at this point. All variables mentioned above were selected for
 
 ### Did you create any new variables from existing variables in the dataset?
 
-loanData$BorrowerRateCategory<-cut(loanData$BorrowerRate,c(0,0.1,0.31,0.5),labels=c('low','normal','high'))
+BorrowerRateCategory <- cut BorrowerRate to the following levels:
+[0 - 0.1] , [0.1 - 0.31] , [0.31 - 0.5]
 
-loanData$HasCreditGrade <- !(loanData$CreditGrade==''|is.na(loanData$CreditGrade))
-loanData$HasProsperRating <- !(loanData$ProsperRating..Alpha.==''|is.na(loanData$ProsperRating..Alpha.))
+loanData$DebtLevel <- cut DebtToIncomeRatio to the following levels:   
+[0 - .3] , [.3 - .49] , [.49-1] ,[1-10.5])
 
-HasIncome <-loanData$IncomeRange == "$75,000-99,999"|loanData$IncomeRange == "$50,000-74,999"|loanData$IncomeRange == "$25,000-49,999"|loanData$IncomeRange == "$1-24,999"
+HasCreditGrade <- CreditGrade is available
+HasProsperRating <- ProsperRating is available
 
-loanData$DebtLevel <- cut(loanData$DebtToIncomeRatio,c(0,.3,.49,1,10.5))
-
+HasIncome >> IncomeRange is available and greater than 0
 
 #####The following variables are created in later sections:
 
+
 ### Of the features you investigated, were there any unusual distributions? Did you perform any operations on the data to tidy, adjust, or change the form of the data? If so, why did you do this?
 
+#####I log transformed the following variables:
 
-debt to income....
-stated monthly income...
+DebtToIncomeRatio
 
+StatedMonthlyIncome
 
-I reordered the following factor variables:
+#####I reordered the following factor variables:
 
 ProsperScore..Alpha,
+
 CreditGrade,
+
 Incomerange,
+
 LoanOrginationQuarter
 
 
 # Bivariate Plots Section
-```{r echo=FALSE, Bivariate_Plots}
-###Distribution over time----
+##Distribution over time
+```{r echo=FALSE, Bivariate_Plots1.1,warning=FALSE}
+
 ggplot(aes(y=BorrowerRate,x=LoanOriginalAmount),data=loanData)+
   geom_point(alpha=1/5)
 
@@ -260,9 +313,13 @@ with(loanData,by(BorrowerRate,Term,summary))
 ggplot(aes(x=LoanOriginationQuarter,y=BorrowerRate,group=1),data=loanData)+
   geom_line(stat='summary',fun.y=mean)+
   theme(axis.text.x=element_text(angle = 45, hjust = 1))
-##Average Borrower Rate was decreasing significantly from 2012 to 2014
+```
 
-## Lets look at this in a bit more detail.
+##### Average Borrower Rate was decreasing significantly from 2012 to 2014
+
+##### Lets look at this in a bit more detail.
+
+```{r echo=FALSE, Bivariate_Plots1.2,warning=FALSE}
 ggplot(aes(x=LoanOriginationQuarter,y=BorrowerRate,group=1),data=loanData)+
   geom_line(stat='summary',fun.y=quantile,probs =.1, linetype=2, color='blue')+
   geom_line(stat='summary',fun.y=quantile,probs =.5, linetype=2, color='blue')+
@@ -274,30 +331,47 @@ ggplot(aes(x=LoanOriginationQuarter,y=BorrowerRate,group=1),data=loanData)+
 ggplot(aes(x=BorrowerRate,color=LoanOriginationQuarter),data=subset(loanData,!is.na(LoanPeriod)))+
   geom_density()+
   scale_color_brewer(palette="Set1")
-## This isn't quite working out... I'll have to look into the distribution over time more in the multivariate section...
+```
 
+##### This isn't quite working out... I'll have to look into the distribution over time more in the multivariate section...
+
+```{r echo=FALSE, Bivariate_Plots3,warning=FALSE}
 ggplot(aes(y=BorrowerRate,x=LoanOriginationQuarter),data=subset(loanData,!is.na(LoanPeriod)))+
   geom_boxplot()+
   theme(axis.text.x=element_text(angle = 45, hjust = 1))
-## All of the exceptionally high borrower rates(>0.4) occur in the first quarter of 2006
+```
 
+##### All of the exceptionally high borrower rates(>0.4) occur in the first quarter of 2006
+
+```{r echo=FALSE, Bivariate_Plots4,warning=FALSE}
 ggplot(aes(x=LoanOriginationQuarter,y=LoanOriginalAmount,group=1),data=loanData)+
   geom_line(stat="summary",fun.y=mean)+
   theme(axis.text.x=element_text(angle = 45, hjust = 1))
-#The average Loan amount went down steeply in Q4 2008 and has been rising steadily since then.
+```
 
-###Debt Level----
+#####The average Loan amount went down steeply in Q4 2008 and rose steadily until 2014.
 
+##Debt Level
+```{r echo=FALSE, Bivariate_Plots5,warning=FALSE}
 ggplot(aes(y=BorrowerRate,x=log10(DebtToIncomeRatio)),data=loanData)+
   geom_point(alpha=1/20)
-## it doesn't look like there is a significant relationship from this graph...
+```
+
+##### it doesn't look like there is a significant relationship from this graph...
+
+```{r echo=FALSE, Bivariate_Plots6,warning=FALSE}
 ggplot(aes(y=BorrowerRate,x=log10(DebtToIncomeRatio)),data=loanData)+
   geom_line(stat='summary',fun.y=median)
 
 ggplot(aes(y=BorrowerRate,x=DebtLevel),data=loanData)+
   geom_boxplot()
-## It looks like there is a trend, although it is still not quite clear..
-## I'm going to make a new variable, DebtLevelBucket to make a smoother plot..
+```
+
+##### It looks like there is a trend, although it is still not quite clear..
+
+##### I'm going to make a new variable, DebtLevelBucket to make a smoother plot..
+
+```{r echo=FALSE, Bivariate_Plots7,warning=FALSE}
 loanData$DebtLevelBucket = cut(log10(loanData$DebtToIncomeRatio),seq(-3,1,.2))
 
 ggplot(aes(y=BorrowerRate,x=DebtLevelBucket,group=1),data=loanData)+
@@ -308,57 +382,71 @@ ggplot(aes(y=BorrowerRate,x=DebtLevelBucket,group=1),data=loanData)+
   geom_line(stat='summary',fun.y=median)+
   theme(axis.text.x=element_text(angle = 45, hjust = 1))+
   facet_wrap(~LoanOriginationQuarter)
-##  Borrower rate and debt level are correlated...
+```
 
-###Credit score and ratings----
+#####  Borrower rate and debt level are correlated?...
 
+##Credit score and ratings
+```{r echo=FALSE, Bivariate_Plots8,warning=FALSE}
 ggplot(aes(y=BorrowerRate,x=CreditScoreRangeLower),data=loanData)+
   geom_point(alpha=1/20)
 
 ggplot(aes(y=BorrowerRate,x=reorder(CreditGrade,BorrowerRate,FUN=median)),data=loanData)+
   geom_boxplot()
-## Borrowers without a credit grade have borrower rate that is average relative to the others...
+```
 
+##### Borrowers without a credit grade have borrower rate that is average relative to the others...
+
+```{r echo=FALSE, Bivariate_Plots9,warning=FALSE}
 ggplot(aes(y=BorrowerRate,x=reorder(ProsperRating..Alpha.,BorrowerRate,FUN=median)),data=loanData)+
   geom_boxplot()
+```
 ## Borrower rates are cleanly distributed among the different prosper ratings. (in contrast to the credit grades which overlap...)
 ## Borrowers without a prosper rating have a median borrower rate that is significantly lower than the others...
+```{r echo=FALSE, Bivariate_Plots10,warning=FALSE}
 ggplot(aes(y=CreditScoreRangeLower,x=reorder(CreditGrade,BorrowerRate,FUN=median)),data=loanData)+
   geom_boxplot()
 
 ggplot(aes(y=CreditScoreRangeLower,x=reorder(ProsperRating..Alpha.,BorrowerRate,FUN=median)),data=loanData)+
   geom_boxplot()
-## Credit score varies much less among different prosper ratings than it does with credit grades...
-## this is probably a different metric that the loan agency uses to distribute borrower rates...
+```
+##### Credit score varies much less among different prosper ratings than it does with credit grades...
+##### this is probably a different metric that the loan agency uses to distribute borrower rates...
 
-###Income----
+##Income
+```{r echo=FALSE, Bivariate_Plots11,warning=FALSE}
 ggplot(aes(x=IncomeRange,y=StatedMonthlyIncome*12),data=loanData)+geom_boxplot()+coord_cartesian(ylim=c(0,150000))
 
 ggplot(aes(y=BorrowerRate,x=reorder(IncomeRange,BorrowerRate,FUN=median)),data=subset(loanData,!is.na(LoanPeriod)))+
   geom_boxplot()
-## The borrower rate goes down as income range goes up...
+```
+##### The borrower rate goes down as income range goes up...
 
-## DECIDE WEATHER TO INCLUDE THIS....
+##### DECIDE WEATHER TO INCLUDE THIS....
 #####loanData$NoIncome <-with(loanData,IncomeRange=="$0" | IncomeRange=='Not displayed' | IncomeRange=='Not employed')
-
+```{r echo=FALSE, Bivariate_Plots12,warning=FALSE}
 ggplot(aes(y=BorrowerRate,x=StatedMonthlyIncome),data=loanData)+
   geom_point()
 
 ggplot(aes(y=BorrowerRate,x=StatedMonthlyIncome),data=loanData)+
   geom_point(alpha=1/10)+
   scale_x_log10(limits=c(500,50000))
+```
 ## no apparent relationship between StatedMonthlyIncome and BorrowerRate...
-
+```{r echo=FALSE, Bivariate_Plots13,warning=FALSE}
 loanData$StatedMonthlyIncomeBucket=cut(log10(loanData$StatedMonthlyIncome),seq(0,5,.2))
 
 ggplot(aes(y=BorrowerRate,x=StatedMonthlyIncomeBucket,group=1),data=loanData)+
   geom_line(stat='summary',fun.y=median)+
   theme(axis.text.x=element_text(angle = 45, hjust = 1))
-
-###EmploymentStatus and BorrowerRate----
+```
+##EmploymentStatus and BorrowerRate----
+```{r echo=FALSE, Bivariate_Plots14,warning=FALSE}
 ggplot(aes(y=BorrowerRate,x=reorder(EmploymentStatus,BorrowerRate,FUN=median)),data=loanData)+
   geom_boxplot()
-##Unemployed borrowers have a significantly higher median that the rest of the categories...
+```
+#####Unemployed borrowers have a significantly higher median that the rest of the categories...
+```{r echo=FALSE, Bivariate_Plots15,warning=FALSE}
 ggplot(aes(y=BorrowerRate,x=IsBorrowerHomeowner),data=loanData)+
   geom_boxplot()
 
@@ -369,8 +457,6 @@ ggplot(aes(y=BorrowerRate,x=reorder(BorrowerState, BorrowerRate, FUN=median) ),d
 ggplot(aes(y=BorrowerRate,x=reorder(Occupation, BorrowerRate,FUN=median )),data=loanData)+
   geom_boxplot()+
   coord_flip()
-
-####----
 ```
 
 # Bivariate Analysis
