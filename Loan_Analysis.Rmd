@@ -1,6 +1,6 @@
 ###Exploratory Data Analysis by Allan Visochek
 ####Using the Prosper Loan Company Dataset
-#####06-01-20015
+#####06-01-2015
 
 
 # Load libraries and data
@@ -1058,7 +1058,8 @@ StatedMonthlyIncome Varies significantly more accross different ProsperRatings t
 ### OPTIONAL: Did you create any models with your dataset? Discuss the strengths and limitations of your model.
 
 #### I creted the following linear models, in order.
-#### The models apply to a subset of the data taken from 2006 to 2009 with a CreditScoreRangeLower of 600 or less.
+
+(The models apply to a subset of the data taken from 2006 to 2009 with a CreditScoreRangeLower of 600 or less.)
 
 ##### Using CreditScoreRangeLower and LoanOriginalAmount
 R^2: 0.3977
