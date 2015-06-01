@@ -1,0 +1,17 @@
+http://stackoverflow.com/questions/6104836/splitting-a-continuous-variable-into-equal-sized-groups
+
+http://stackoverflow.com/questions/16184947/cut-error-breaks-are-not-unique
+
+http://stackoverflow.com/questions/10438752/adding-x-and-y-axis-labels-in-ggplot2
+
+https://stat.ethz.ch/pipermail/r-help/2003-February/029560.html
+
+http://docs.ggplot2.org/current/scale_gradient.html
+
+http://docs.ggplot2.org/0.9.3.1/facet_grid.html
+
+https://github.com/hadley/ggplot2/wiki/Align-two-plots-on-a-page
+
+Setting chart height...
+http://kbroman.org/knitr_knutshell/pages/Rmarkdown.html
+
