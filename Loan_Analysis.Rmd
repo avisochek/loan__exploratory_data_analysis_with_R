@@ -720,7 +720,8 @@ the BorrowerRate and used the Prosper Rating thereafter.
 loanData$CreditGradeOrProsperRating <-loanData$LoanOriginationQuarter %in% levels(loanData$LoanOriginationQuarter)[0:14]
 ```
 
-### Borrower Rate v. Credit Score by quarter
+Next, let's investigate how the correlation between BorrowerRate and CreditScoreRangeLower changes over time.
+
 ```{r echo=FALSE, Multivariate_Plots5sdrge43523,message=FALSE,warning=FALSE}
 
 # p1<-ggplot(aes(y=BorrowerRate,x=CreditScoreRangeLower),
@@ -740,14 +741,14 @@ loanData$CreditGradeOrProsperRating <-loanData$LoanOriginationQuarter %in% level
 #   ggtitle("BorrowerRate v. Credit Score after Q2 2009")
 # grid.arrange(p1,p2)
 
-print(ggplot(aes(y=BorrowerRate,x=CreditScoreRangeLower),
-       data=subset(loanData,
-                   !is.na(LoanOriginationQuarter)))+
-  xlim(c(440,880))+
-  geom_jitter(alpha=1/5)+
-  facet_wrap(~LoanOriginationQuarter)+
-  scale_y_continuous(breaks=c(0.1,0.2,0.3))+
-  theme(axis.text.x=element_text(angle = 45, hjust = 1)))
+# print(ggplot(aes(y=BorrowerRate,x=CreditScoreRangeLower),
+#        data=subset(loanData,
+#                    !is.na(LoanOriginationQuarter)))+
+#   xlim(c(440,880))+
+#   geom_jitter(alpha=1/5)+
+#   facet_wrap(~LoanOriginationQuarter)+
+#   scale_y_continuous(breaks=c(0.1,0.2,0.3))+
+#   theme(axis.text.x=element_text(angle = 45, hjust = 1)))
 ```
 
 ### Correlation Between BorrowerRate and CreditScore by Quarter
@@ -779,6 +780,7 @@ In particular, Correlation is higher Goes down after Q3 2011.
 
 ### LoanOriginalAmount by Quarter
 ```{r echo=FALSE, Multivariate_Plots62353245,message=FALSE,warning=FALSE}
+loanData$year<- factor(substr(loanData$LoanOriginationQuarter,4,7))
 # ggplot(aes(x=LoanOriginalAmount,y=BorrowerRate),data=loanData)+
 #   geom_point()+
 #   facet_wrap(~LoanOriginationQuarter,ncol=4)+
@@ -811,10 +813,10 @@ ggplot(aes(x=LoanOriginalAmount,y=BorrowerRate),
                          !is.na(LoanOriginationQuarter)&
                          Term=="36"))+
   geom_point(alpha=1/3)+
-  facet_wrap(~LoanOriginationQuarter)
+  facet_wrap(~year)
 ```
 
-LoanOriginalAmount appears to play a role in the BorrowerRate at least up until Q2 2010. 
+The bottoms of the plots for 2006 through 2010 have an upwards slant. It appears LoanOriginalAmount may play a role in the BorrowerRate at least up until Q2 2010.
 
 ```{r echo=FALSE, Multivariate_Plots734236,message=FALSE,warning=FALSE}
 # ggplot(aes(x=LoanOriginalAmount,y=BorrowerRate),data=subset(loanData,CreditGradeOrProsperRating))+
@@ -864,6 +866,7 @@ ggplot(aes(x=quarters,group=1,y=cors2),data=LoanAmountCor)+geom_line()+
   ylab("Correlation Coefficient")
 ```
 
+</br>
 Correlation between BorrowerRate and LoanOriginalAmount goes up in 2007 and back down around Q2 2013.
 
 
@@ -1299,7 +1302,9 @@ The Second two models, with higher R^2 values, do a much better job of modelling
 ###NEW PLOT
 ggplot(aes(y=BorrowerRate,x=reorder(Occupation, BorrowerRate,FUN=median )),data=loanData)+
   geom_boxplot()+
-  coord_flip()
+  coord_flip()+
+  xlab("Occupation")+
+  ylab("Borrower Rate [%]")
 ```
 
 ### Description One
@@ -1316,7 +1321,8 @@ ggplot(aes(x=LoanOriginationQuarter,y=BorrowerRate,group=1),
                    !is.na(LoanOriginationQuarter)))+
   geom_line(stat='summary',fun.y=median)+
   theme(axis.text.x=element_text(angle = 45, hjust = 1))+
-  ylab("Median BorrowerRate")
+  ylab("Median Borrower Rate [%]")+
+  xlab("Loan Origination Quarter")
 ```
 
 ### Description Two
@@ -1329,7 +1335,7 @@ Given the relatively large number of loans, one might otherwise expect the media
 
 ### Plot Three
 ```{r echo=FALSE,Plot_Three,message=FALSE,warning=FALSE}
-p1<- ggplot(aes(y=BorrowerRate,
+ggplot(aes(y=BorrowerRate,
            x=6.083e-01+
              CreditScoreRangeLower*-6.846e-04+
              LoanOriginalAmount*2.284e-06),
@@ -1339,10 +1345,14 @@ p1<- ggplot(aes(y=BorrowerRate,
   CreditScoreRangeLower>600))+
   geom_jitter(alpha=1/5)+
   geom_smooth(method="lm")+
-  ggtitle("Linear Model for Loans Originating from Q1 2006 through Q2 2009")
+  ggtitle("Linear Model for Loans Originating from Q1 2006 through Q2 2009")+
+  xlab("Prediction [%]")+
+  ylab("Borrower Rate [%]")
 
+print("R^2:")
+print(summary(fit2)$r.squared)
 
-p2<-ggplot(aes(y=BorrowerRate,
+ggplot(aes(y=BorrowerRate,
            x=1.020e+00+ 
              LoanOriginalAmount*1.661e-06+
              log10(DebtToIncomeRatio + 1)*1.471e-01+
@@ -1354,14 +1364,18 @@ p2<-ggplot(aes(y=BorrowerRate,
   geom_jitter(alpha=1/2)+
   geom_smooth(method="lm")+
   coord_cartesian(xlim=c(0,0.35))+
-  ggtitle("Linear Model for Loans Originating from Q3 2009 through Q1 2011")
+  ggtitle("Linear Model for Loans Originating from Q3 2009 through Q1 2011")+
+  xlab("Prediction [%]")+
+  ylab("Borrower Rate [%]")
 
-grid.arrange(p1,p2)
+print("R^2:")
+print(summary(fit3)$r.squared)
+
 ```
 
 ### Description Three
 
-The above plots show two linear model of the Borrower Rate, the first for loans up to Q2 2009, and the second for loans from Q3 2009 through Q1 2011.
+The above plots show two linear models of the Borrower Rate, the first for loans up to Q2 2009, and the second for loans from Q3 2009 through Q1 2011.
 
 This shows that variation in the BorrowerRate from Q1 2006 to Q2 2009 is explained primarily by the LoanOriginalAmount and the Credit Score for the borrowers with a credit score of greater than 0. Additionally, variation in the BorrowerRate from Q3 2009 through Q1 2011 is explained primarily by the LoanOriginalAmount, the Credit Score and the DebtToIncomeRatio.
 
