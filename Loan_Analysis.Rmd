@@ -27,7 +27,8 @@ library(gridExtra)
 ```
 
 ```{r echo=FALSE,read_data,message=FALSE,warning=FALSE}
-loanData<-read.csv("/home/allan/Desktop/loan__exploratory_data_analysis_with_R/prosperLoanData.csv")
+loanData<-
+  read.csv("/home/allan/Desktop/loan__exploratory_data_analysis_with_R/prosperLoanData.csv")
 ```
 
 # Univariate Plots Section
@@ -134,7 +135,8 @@ There are a large number of Borrowers that don't have a prosper rating or don't 
 loanData$HasCreditGrade <- 
    !(loanData$CreditGrade==''|is.na(loanData$CreditGrade))
 loanData$HasProsperRating <-
-   !(loanData$ProsperRating..Alpha.==''|is.na(loanData$ProsperRating..Alpha.))
+   !(loanData$ProsperRating..Alpha.==''|
+       is.na(loanData$ProsperRating..Alpha.))
 
 # I'm also going to switch the order so that AA comes before A
  loanData$CreditGrade <-
@@ -400,7 +402,8 @@ loanData<-subset(loanData,Term=="36")
 
 ```{r echo=FALSE, warning=FALSE}
 
-ggplot(aes(y=BorrowerRate,x=LoanOriginalAmount),data=loanData)+
+ggplot(aes(y=BorrowerRate,x=LoanOriginalAmount),
+       data=loanData)+
   geom_point()
 ```
 
@@ -594,7 +597,9 @@ Homeowners have a lower median BorrowerRate than non-homeowners.
 
 ### BorrowerRate v. BorrowerState
 ```{r echo=FALSE, Bivariate_Plots15.873265987230,warning=FALSE,fig.height=8}
-ggplot(aes(y=BorrowerRate,x=reorder(BorrowerState, BorrowerRate, FUN=median) ),data=loanData)+
+ggplot(aes(y=BorrowerRate,
+           x=reorder(BorrowerState, BorrowerRate, FUN=median) ),
+       data=loanData)+
   geom_boxplot()+
   coord_flip()+
   xlab("State")
@@ -963,6 +968,7 @@ ggplot(aes(x=quarters,group=1,y=cors4),data=IncomeCor)+geom_line()+
   xlab("LoanOriginationQuarter")+
   ylab("Correlation Coefficient")
 ```
+
 Correlation between StatedMonthlyIncome and BorrowerRate falls in Q2 2012
 
 
@@ -1161,7 +1167,9 @@ ggplot(aes(y=BorrowerRate,
              LoanOriginalAmount*2.284e-06),
        data=subset(
     loanData,
-    (CreditGradeOrProsperRating==TRUE)&CreditScoreRangeLower>0&IncomeVerifiable=="True"))+
+    (CreditGradeOrProsperRating==TRUE)&
+      CreditScoreRangeLower>0&
+      IncomeVerifiable=="True"))+
   geom_jitter(alpha=1/5)+
   geom_smooth(method="lm")
 ```
@@ -1379,8 +1387,7 @@ The above plots show two linear models of the Borrower Rate, the first for loans
 
 This shows that variation in the BorrowerRate from Q1 2006 to Q2 2009 is explained primarily by the LoanOriginalAmount and the Credit Score for the borrowers with a credit score of greater than 0. Additionally, variation in the BorrowerRate from Q3 2009 through Q1 2011 is explained primarily by the LoanOriginalAmount, the Credit Score and the DebtToIncomeRatio.
 
-###### The fact that DebtToIncomeRatio played a role in linear model for the second period, but not in the first is interesting. According to the National Bureau of Economic Research, the recession ended in the second quarter of 2009, which is also the end of the first model and start of the second. This may imply that the ability of the borrower to pay the loan was taken more seriously after the recession.
-------
+The fact that DebtToIncomeRatio played a role in linear model for the second period, but not in the first is interesting. According to the National Bureau of Economic Research, the recession ended in the second quarter of 2009, which is also the end of the first model and start of the second. This may imply that the ability of the borrower to pay the loan was taken more seriously after the recession.
 
 # Reflection
 
